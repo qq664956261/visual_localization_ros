@@ -1,0 +1,25 @@
+<launch>
+    <node pkg="visual_localization" type="localization_node" name="localization_node" output="screen">
+        <param name="left_topic" value="/imsee/image/rectified/left"/>
+        <param name="right_topic" value="/imsee/image/rectified/right"/>
+
+
+        <param name="map_path" value="/home/zc/code/class_4/visual_mapping_localization/build/map_sp.txt"/>
+        <param name="camera_yaml" value="/home/zc/data/4seasons_export_pose/my.yaml"/>
+        <param name="superpoint_engine" value="/home/zc/code/learned_features_inference-tensorRT/weight/superpoint_640*400.trt"/>
+
+
+        <param name="image_width" value="640"/>
+        <param name="image_height" value="400"/>
+        <param name="force_resize" value="false"/>
+
+
+        <param name="world_frame" value="map"/>
+        <param name="camera_frame" value="camera"/>
+
+
+        <param name="use_clahe" value="false"/>
+        <param name="show_debug" value="true"/>
+        <param name="enable_debug" value="true"/>
+    </node>
+</launch>
