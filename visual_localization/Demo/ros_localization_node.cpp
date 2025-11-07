@@ -26,6 +26,12 @@ RosLocalizationNode::RosLocalizationNode(ros::NodeHandle& nh, ros::NodeHandle& p
     pnh_.param<std::string>("camera_frame", camera_frame_, camera_frame_);
     pnh_.param<bool>("show_debug", show_debug_, false);
 
+    // 统一发布线程参数
+    pnh_.param<std::string>("debug_image_ns", debug_image_ns_, std::string("debug_image"));
+    pnh_.param<std::string>("debug_cloud_ns", debug_cloud_ns_, std::string("debug_cloud"));
+    pnh_.param<double>("debug_image_fps", debug_image_fps_, 30.0);
+    pnh_.param<double>("debug_cloud_fps", debug_cloud_fps_, 5.0);
+
     // 初始化算法层
     if (!init(params)) {
         ROS_FATAL("LocalizationCore init failed");
@@ -42,10 +48,21 @@ RosLocalizationNode::RosLocalizationNode(ros::NodeHandle& nh, ros::NodeHandle& p
     path_pub_ = pnh_.advertise<nav_msgs::Path>("path", 10);
     path_.header.frame_id = world_frame_;
 
+    // 统一发布线程：注册图像与两路点云
+    if (show_debug_) {
+        debug_.reset(new DebugPublisherWorker(pnh_, debug_image_ns_, debug_cloud_ns_));
+        debug_->addImageChannel("reproj", debug_image_fps_);      // ~debug_image
+        debug_->addCloudChannel("map",   debug_cloud_fps_, "map");   // ~debug_cloud/map
+        debug_->addCloudChannel("frame", debug_cloud_fps_, "map");   // ~debug_cloud/frame
+        debug_->start();
+    }
+
     // 启动计算线程
     start();
 }
-
+    RosLocalizationNode::~RosLocalizationNode() {
+    if (debug_) debug_->stop();
+}
 void RosLocalizationNode::stereoCallback(const sensor_msgs::ImageConstPtr& left_msg,
                                          const sensor_msgs::ImageConstPtr& right_msg)
 {
@@ -106,15 +123,27 @@ void RosLocalizationNode::onDebugImage(const cv::Mat& img, double timestamp_sec)
 
     void RosLocalizationNode::onDebugImage(const std::string& tag,
                                        const cv::Mat& img, double ts) {
-    if (!show_debug_) return;
-    auto& pub = dbg_pubs_[tag];
-    if (!pub) {
-        const std::string topic = debug_ns_ + "/" + tag;   // e.g. ~debug/matches
-        pub.reset(new ImagePublisherWorker(pnh_, topic, 1, debug_image_fps_));
-        pub->start();
-    }
-    ros::Time stamp; stamp.fromSec(ts);
-    pub->post(img, stamp); // 异步发布
+    // if (!show_debug_) return;
+    // auto& pub = dbg_pubs_[tag];
+    // if (!pub) {
+    //     const std::string topic = debug_ns_ + "/" + tag;   // e.g. ~debug/matches
+    //     pub.reset(new ImagePublisherWorker(pnh_, topic, 1, debug_image_fps_));
+    //     pub->start();
+    // }
+    // ros::Time stamp; stamp.fromSec(ts);
+    // pub->post(img, stamp); // 异步发布
+    if (!show_debug_ || !debug_) return;
+    ros::Time t; t.fromSec(ts);
+    debug_->postImage(tag, img, t);  // ~debug_image
+}
+    void RosLocalizationNode::onPointCloud(const std::string& tag,
+                                       pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud,
+                                       double timestamp_sec,
+                                       const std::string& frame_id)
+{
+    if (!debug_) return;
+    ros::Time t; t.fromSec(timestamp_sec);
+    debug_->postCloud(tag, cloud, t, frame_id); // ~debug_cloud/<tag>
 }
 
 } // namespace vloc

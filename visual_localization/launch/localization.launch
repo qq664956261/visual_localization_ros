@@ -22,5 +22,11 @@
         <param name="use_clahe" value="false"/>
         <param name="show_debug" value="true"/>
         <param name="enable_debug" value="true"/>
+
+        <!-- 统一发布线程参数 -->
+        <param name="debug_image_ns" value="debug_image"/>
+        <param name="debug_cloud_ns" value="debug_cloud"/>
+        <param name="debug_image_fps" value="20"/>
+        <param name="debug_cloud_fps" value="5"/>
     </node>
 </launch>

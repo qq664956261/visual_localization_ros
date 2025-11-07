@@ -40,6 +40,20 @@ bool LocalizationCore::init(const Params& p)
     // 可视化线程
     vis_thread_ = std::thread(Visualization::run, &vis_, std::ref(map_));
 
+    // 新增：静态地图点云缓存
+    map_cloud_.reset(new pcl::PointCloud<pcl::PointXYZ>());
+    map_cloud_->reserve(map_.map_points.size());
+    for (const auto& mp : map_.map_points) {
+        if (!mp.second) continue;
+        pcl::PointXYZ p;
+        p.x = static_cast<float>(mp.second->x3D.x());
+        p.y = static_cast<float>(mp.second->x3D.y());
+        p.z = static_cast<float>(mp.second->x3D.z());
+        map_cloud_->push_back(p);
+    }
+    map_cloud_->width = map_cloud_->size();
+    map_cloud_->height = 1;
+
     init_T_.setIdentity();
     last_T_.setIdentity();
     frame_cnt_ = 0;
@@ -194,6 +208,31 @@ void LocalizationCore::computeLoop()
             }
             //onDebugImage(show, item.ts);
             onDebugImage("reproj", show, item.ts);
+
+
+
+            // 点云调试：当前帧点云（由关联 map_points 组成，世界系）
+            pcl::PointCloud<pcl::PointXYZ>::Ptr frame_cloud;
+            frame_cloud.reset(new pcl::PointCloud<pcl::PointXYZ>);
+            frame_cloud->reserve(tgt->map_points.size());
+            for (const auto& mp : tgt->map_points) {
+                if (!mp) continue;
+                pcl::PointXYZ p;
+                p.x = static_cast<float>(mp->x3D.x());
+                p.y = static_cast<float>(mp->x3D.y());
+                p.z = static_cast<float>(mp->x3D.z());
+                frame_cloud->push_back(p);
+            }
+            frame_cloud->width = frame_cloud->size();
+            frame_cloud->height = 1;
+
+            onPointCloud("frame", frame_cloud, item.ts, "map");
+
+            // 地图点云节流（例如每 5s 发布一次）
+            if (item.ts - last_map_pub_sec_ > 5 && map_cloud_) {
+                onPointCloud("map", map_cloud_, item.ts, "map");
+                last_map_pub_sec_ = item.ts;
+            }
         }
 
         // 回调位姿

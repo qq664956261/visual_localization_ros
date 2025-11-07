@@ -20,6 +20,8 @@
 #include "bundle_adjustment.h"
 #include "camera.h"
 #include "localization_helper.h"
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
 
 namespace vloc {
@@ -64,9 +66,13 @@ namespace vloc {
         virtual void onDebugImage(const cv::Mat& img, double timestamp_sec) {}
         virtual void onDebugImage(const std::string& tag, const cv::Mat& img, double ts)
         {
-            // 默认回落到单路接口，保持兼容
-            onDebugImage(img, ts);
+            // // 默认回落到单路接口，保持兼容
+            // onDebugImage(img, ts);
         }
+        virtual void onPointCloud(const std::string& tag,
+            pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud,
+            double timestamp_sec,
+            const std::string& frame_id){}
 
 
 
@@ -109,6 +115,10 @@ namespace vloc {
         Eigen::Matrix4d init_T_ = Eigen::Matrix4d::Identity();
         Eigen::Matrix4d last_T_ = Eigen::Matrix4d::Identity();
         int frame_cnt_ = 0;
+
+        // 新增：地图点云缓存 + 节流
+        pcl::PointCloud<pcl::PointXYZ>::Ptr map_cloud_;
+        double last_map_pub_sec_ = 0.0;
 
 
         // 线程与队列
