@@ -11,6 +11,7 @@
 #include <tf/transform_broadcaster.h>
 
 #include "localization_core.h"
+#include "image_publisher_worker.h"
 
 namespace vloc {
 
@@ -25,6 +26,8 @@ protected:
     // 算法回调：在这里发布 ROS 消息
     void onPose(const Eigen::Matrix4d& T_w_c, double timestamp_sec) override;
     void onDebugImage(const cv::Mat& img, double timestamp_sec) override;
+    void onDebugImage(const std::string& tag,
+                                   const cv::Mat& img, double ts) override;
 
 private:
     void stereoCallback(const sensor_msgs::ImageConstPtr& left_msg,
@@ -42,6 +45,10 @@ private:
     std::string world_frame_ = "map";
     std::string camera_frame_ = "camera";
     bool show_debug_ = false;
+
+    std::unordered_map<std::string, std::unique_ptr<ImagePublisherWorker>> dbg_pubs_;
+    std::string debug_ns_ = "debug";   // 最终话题 ~debug/<tag>
+    double debug_image_fps_ = 30.0;
 };
 
 } // namespace vloc

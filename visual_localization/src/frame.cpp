@@ -29,14 +29,14 @@ namespace VISUAL_MAPPING {
 
     Frame::Frame(int id_, std::shared_ptr<FeatureDetection> detector, Eigen::Matrix4d T, cv::Mat &image_left, cv::Mat &image_right,
                  Camera *cam_left, Camera *cam_right, Eigen::Matrix4d &T12) {
-                    std::cout << "image_left channels: " << image_left.channels()
-                    << ", rows: "    << image_left.rows
-                    << ", cols: "    << image_left.cols
-                    << std::endl;
-                    std::cout << "image_right channels: " << image_right.channels()
-                    << ", rows: "    << image_right.rows
-                    << ", cols: "    << image_right.cols
-                    << std::endl;
+                    // std::cout << "image_left channels: " << image_left.channels()
+                    // << ", rows: "    << image_left.rows
+                    // << ", cols: "    << image_left.cols
+                    // << std::endl;
+                    // std::cout << "image_right channels: " << image_right.channels()
+                    // << ", rows: "    << image_right.rows
+                    // << ", cols: "    << image_right.cols
+                    // << std::endl;
         image = image_left;
         id = id_;
         camera = cam_left;
@@ -51,61 +51,12 @@ namespace VISUAL_MAPPING {
 
 
 
-//         std::vector<cv::DMatch> matches1;
-//         cv::BFMatcher matcher1(cv::NORM_L2, true);
-//         matcher1.match(descriptors, descriptors_right, matches1);
-    
-//         // 5. fundamental matrix estimation
-//         std::vector<cv::Point2f> points1, points2;
-//         for (auto& match : matches1)
-//         {
-//             points1.push_back(cv::Point2f(features_uv[match.queryIdx].x(),features_uv[match.queryIdx].y()));
-//             points2.push_back(cv::Point2f(features_right[match.trainIdx].x(), features_right[match.trainIdx].y()));
-//         }
-//         std::vector<uchar> status;
-//         cv::Mat F = cv::findFundamentalMat(points1, points2, cv::FM_RANSAC, 3, 0.99, status);
-    
-//         std::vector<cv::DMatch> good_matches;
-//         std::vector<cv::DMatch> bad_matches;
-//         for (int i = 0; i < status.size(); i++)
-//         {
-//             if (status[i] == 1)
-//             {
-//                 good_matches.push_back(matches1[i]);
-//             }
-//             else
-//             {
-//                 bad_matches.push_back(matches1[i]);
-//             }
-//         }
-//         #define IMAGE_WIDTH 640
-// #define IMAGE_HEIGHT 400
-    
-//         // 6. show the matches
-//         cv::Mat img_matches = cv::Mat(IMAGE_HEIGHT, IMAGE_WIDTH * 2, CV_8UC1);
-//         image_left.copyTo(img_matches(cv::Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
-//         image_right.copyTo(img_matches(cv::Rect(IMAGE_WIDTH, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
-    
-
-//         int num;
-//         for (const auto m:good_matches) {
-//             num++;
-//             cv::Scalar color(
-//                 (unsigned) (37 * num % 255),
-//                 (unsigned) (17 * num % 255),
-//                 (unsigned) (97 * num % 255)
-//             );
-//             cv::Point2f pt1 (features_uv[m.queryIdx].x(),features_uv[m.queryIdx].y());
-//             cv::Point2f pt2 (features_right[m.trainIdx].x(), features_right[m.trainIdx].y());
-//             cv::line(img_matches, pt1, cv::Point2f(pt2.x + IMAGE_WIDTH, pt2.y), color, 2);
-//         }
-    
-//         cv::imshow("matches", img_matches);
 
 
 
 
-        std::cout<<"features_uv.size():"<<features_uv.size()<<std::endl;
+        //std::cout<<"features_uv.size():"<<features_uv.size()<<std::endl;
+
         // 2. compute depth
         Matcher matcher;
         auto matches = matcher.match_stereo(image_left, image_right, features_uv, features_right, descriptors, descriptors_right);
@@ -115,39 +66,39 @@ namespace VISUAL_MAPPING {
 
 
     
-#define IMAGE_WIDTH 640
-#define IMAGE_HEIGHT 400
-    // . show the matches
-    cv::Mat img_matches = cv::Mat(IMAGE_HEIGHT, IMAGE_WIDTH * 2, CV_8UC3);
-    cv::Mat image_left1;
-    cv::Mat image_right1;
-    cv::cvtColor(image_left, image_left1, cv::COLOR_GRAY2BGR);
-    cv::cvtColor(image_right, image_right1, cv::COLOR_GRAY2BGR);
-    image_left1.copyTo(img_matches(cv::Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
-    image_right1.copyTo(img_matches(cv::Rect(IMAGE_WIDTH, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
+// #define IMAGE_WIDTH 640
+// #define IMAGE_HEIGHT 400
+//     // . show the matches
+//     cv::Mat img_matches = cv::Mat(IMAGE_HEIGHT, IMAGE_WIDTH * 2, CV_8UC3);
+//     cv::Mat image_left1;
+//     cv::Mat image_right1;
+//     cv::cvtColor(image_left, image_left1, cv::COLOR_GRAY2BGR);
+//     cv::cvtColor(image_right, image_right1, cv::COLOR_GRAY2BGR);
+//     image_left1.copyTo(img_matches(cv::Rect(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
+//     image_right1.copyTo(img_matches(cv::Rect(IMAGE_WIDTH, 0, IMAGE_WIDTH, IMAGE_HEIGHT)));
 
-    int num;
-    for (const auto m:matches) {
-        num++;
-        cv::Scalar color(
-            (unsigned) (37 * num % 255),
-            (unsigned) (17 * num % 255),
-            (unsigned) (97 * num % 255)
-        );
-        cv::Point2f pt1(features_uv[m.first].x(), features_uv[m.first].y());
-        cv::Point2f pt2(features_right[m.second].x(), features_right[m.second].y());
-        cv::line(img_matches, pt1, cv::Point2f(pt2.x + IMAGE_WIDTH, pt2.y), color, 2);
-    }
-    cv::imshow("img_matches", img_matches);
-    cv::waitKey(1); // 调试时也可以用 0 暂停
+//     int num;
+//     for (const auto m:matches) {
+//         num++;
+//         cv::Scalar color(
+//             (unsigned) (37 * num % 255),
+//             (unsigned) (17 * num % 255),
+//             (unsigned) (97 * num % 255)
+//         );
+//         cv::Point2f pt1(features_uv[m.first].x(), features_uv[m.first].y());
+//         cv::Point2f pt2(features_right[m.second].x(), features_right[m.second].y());
+//         cv::line(img_matches, pt1, cv::Point2f(pt2.x + IMAGE_WIDTH, pt2.y), color, 2);
+//     }
+//     cv::imshow("img_matches", img_matches);
+//     cv::waitKey(1); // 调试时也可以用 0 暂停
     
 
 
 
 
 
-        std::cout<<"matches.size():"<<matches.size()<<std::endl;
-        std::cout<<"T12:"<<T12<<std::endl;
+        // std::cout<<"matches.size():"<<matches.size()<<std::endl;
+        // std::cout<<"T12:"<<T12<<std::endl;
         double baseline = T12.block<3, 1>(0, 3).norm();
         features_depth.clear();
         features_depth.resize(features_uv.size(), -1);
@@ -181,7 +132,7 @@ namespace VISUAL_MAPPING {
 //        }
 //        cv::imshow("show", show);
 //        cv::waitKey(0);
-        std::cout << "Triangulated " << cnt << " points" << std::endl;
+        //std::cout << "Triangulated " << cnt << " points" << std::endl;
     }
 
 

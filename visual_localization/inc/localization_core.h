@@ -62,6 +62,12 @@ namespace vloc {
         // 供子类覆写：位姿输出、调试图像输出
         virtual void onPose(const Eigen::Matrix4d& T_w_c, double timestamp_sec) {}
         virtual void onDebugImage(const cv::Mat& img, double timestamp_sec) {}
+        virtual void onDebugImage(const std::string& tag, const cv::Mat& img, double ts)
+        {
+            // 默认回落到单路接口，保持兼容
+            onDebugImage(img, ts);
+        }
+
 
 
         // 读取相机 yaml（含 T_c1_c2）

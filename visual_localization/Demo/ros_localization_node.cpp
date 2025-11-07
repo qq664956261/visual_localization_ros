@@ -104,4 +104,17 @@ void RosLocalizationNode::onDebugImage(const cv::Mat& img, double timestamp_sec)
     cv::waitKey(1);
 }
 
+    void RosLocalizationNode::onDebugImage(const std::string& tag,
+                                       const cv::Mat& img, double ts) {
+    if (!show_debug_) return;
+    auto& pub = dbg_pubs_[tag];
+    if (!pub) {
+        const std::string topic = debug_ns_ + "/" + tag;   // e.g. ~debug/matches
+        pub.reset(new ImagePublisherWorker(pnh_, topic, 1, debug_image_fps_));
+        pub->start();
+    }
+    ros::Time stamp; stamp.fromSec(ts);
+    pub->post(img, stamp); // 异步发布
+}
+
 } // namespace vloc

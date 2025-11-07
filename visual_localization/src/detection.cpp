@@ -104,7 +104,7 @@ namespace VISUAL_MAPPING {
             } else {
                 if (use_tensorrt)
                 {
-                    std::cout<<"image.type():"<<image.type()<<std::endl;
+                    //std::cout<<"image.type():"<<image.type()<<std::endl;
                     net_tensorRT_ptr->run(image, score_map, desc_map);
                 }
                 else
@@ -148,28 +148,28 @@ namespace VISUAL_MAPPING {
 
 
                 
-    cv::Mat image1;
+    // cv::Mat image1;
 
-    image1 = image.clone();
+    // image1 = image.clone();
 
-    // 把匹配的点画上去并连线
-    for (size_t i = 0; i < features_uv.size(); ++i) {
+    // // 把匹配的点画上去并连线
+    // for (size_t i = 0; i < features_uv.size(); ++i) {
 
-        // 点坐标
-        cv::Point2f pt_l(features_uv[i].x(),  features_uv[i].y());
-        // 颜色随便来一个
-        cv::Scalar color(
-            (unsigned) (37 * i % 255),
-            (unsigned) (17 * i % 255),
-            (unsigned) (97 * i % 255)
-        );
-        // 画点
-        cv::circle(image1, pt_l, 3, color, -1, cv::LINE_AA);
-    }
+    //     // 点坐标
+    //     cv::Point2f pt_l(features_uv[i].x(),  features_uv[i].y());
+    //     // 颜色随便来一个
+    //     cv::Scalar color(
+    //         (unsigned) (37 * i % 255),
+    //         (unsigned) (17 * i % 255),
+    //         (unsigned) (97 * i % 255)
+    //     );
+    //     // 画点
+    //     cv::circle(image1, pt_l, 3, color, -1, cv::LINE_AA);
+    // }
 
-    // 4. 显示 / 保存
-    cv::imshow("featurepoints", image1);
-    cv::waitKey(1); // 调试时也可以用 0 暂停
+    // // 4. 显示 / 保存
+    // cv::imshow("featurepoints", image1);
+    // cv::waitKey(1); // 调试时也可以用 0 暂停
             }
         } else {
             std::cout<<"model type not supported"<<std::endl;

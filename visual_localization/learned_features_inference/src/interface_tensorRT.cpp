@@ -98,7 +98,7 @@ void InterfaceTensorRT::run(cv::Mat &image, cv::Mat& score_map_mat, cv::Mat& des
     {
         C = 3;
     }
-    std::cout<<"C:"<<C<<std::endl;
+    //std::cout<<"C:"<<C<<std::endl;
                 // 1. 通知 Context：第 0 个 binding（输入）的动态形状
                 int inputIndex  = engine->getBindingIndex("input");
                 int scoreIndex  = engine->getBindingIndex("score");   // or your output_names
@@ -107,21 +107,21 @@ void InterfaceTensorRT::run(cv::Mat &image, cv::Mat& score_map_mat, cv::Mat& des
                 // for(int i=0;i<10;i++) std::cout<<tmp_buffer[i]<<",";
                 // std::cout<<"\n";
     cudaMemcpyAsync(buffers[inputIndex], tmp_buffer, C * width * height * sizeof(float), cudaMemcpyHostToDevice);
-    std::cout<<"inputIndex:"<<inputIndex<<std::endl;
-    std::cout<<"scoreIndex:"<<scoreIndex<<std::endl;
-    std::cout<<"descIndex:"<<descIndex<<std::endl;
+    // std::cout<<"inputIndex:"<<inputIndex<<std::endl;
+    // std::cout<<"scoreIndex:"<<scoreIndex<<std::endl;
+    // std::cout<<"descIndex:"<<descIndex<<std::endl;
     int nb = engine->getNbBindings();
-for (int b = 0; b < nb; ++b) {
-    bool isInput = engine->bindingIsInput(b);
-    auto dims = engine->getBindingDimensions(b);
-    std::cout << (isInput ? "Input " : "Output ")
-              << b << " : name=" << engine->getBindingName(b)
-              << "  dims=[";
-    for (int i = 0; i < dims.nbDims; ++i) {
-      std::cout << dims.d[i] << (i+1<dims.nbDims?",":"");
-    }
-    std::cout << "]\n";
-}
+// for (int b = 0; b < nb; ++b) {
+//     bool isInput = engine->bindingIsInput(b);
+//     auto dims = engine->getBindingDimensions(b);
+//     std::cout << (isInput ? "Input " : "Output ")
+//               << b << " : name=" << engine->getBindingName(b)
+//               << "  dims=[";
+//     for (int i = 0; i < dims.nbDims; ++i) {
+//       std::cout << dims.d[i] << (i+1<dims.nbDims?",":"");
+//     }
+//     std::cout << "]\n";
+// }
     //context->enqueueV3(stream);
         // stream 是提前创建好的 cudaStream_t
 
@@ -132,9 +132,9 @@ for (int b = 0; b < nb; ++b) {
     //cudaMemcpyAsync(buffers[0], tmp_buffer, in_bytes, cudaMemcpyHostToDevice, stream);
     // cudaMalloc(&buffers[scoreIndex],  width * height * sizeof(float));
     // cudaMalloc(&buffers[descIndex],  descriptor_width * descriptor_height * descriptor_dim * sizeof(float));
-    std::cout<<"descriptor_width:"<<descriptor_width<<std::endl;
-    std::cout<<"descriptor_height:"<<descriptor_height<<std::endl;
-    std::cout<<"descriptor_dim:"<<descriptor_dim<<std::endl;
+    // std::cout<<"descriptor_width:"<<descriptor_width<<std::endl;
+    // std::cout<<"descriptor_height:"<<descriptor_height<<std::endl;
+    // std::cout<<"descriptor_dim:"<<descriptor_dim<<std::endl;
     // 3. 执行推理
         bool ok = context->enqueueV2(buffers, stream, nullptr);
         if (!ok) {

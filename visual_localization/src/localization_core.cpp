@@ -192,7 +192,8 @@ void LocalizationCore::computeLoop()
                 cv::circle(show, cv::Point((int)tgt->get_features_uv()[i][0], (int)tgt->get_features_uv()[i][1]), 2, cv::Scalar(0, 0, 255), 2);
 
             }
-            onDebugImage(show, item.ts);
+            //onDebugImage(show, item.ts);
+            onDebugImage("reproj", show, item.ts);
         }
 
         // 回调位姿
