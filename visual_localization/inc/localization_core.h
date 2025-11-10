@@ -128,6 +128,7 @@ namespace vloc {
         std::deque<StereoItem> q_;
         std::atomic<bool> running_{false};
         cv::Ptr<cv::CLAHE> clahe_;
+        Eigen::Matrix4d T_lidar_cam;
     };
 
 

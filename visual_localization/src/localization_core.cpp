@@ -11,6 +11,16 @@ LocalizationCore::~LocalizationCore() { stop(); }
 
 bool LocalizationCore::init(const Params& p)
 {
+    Eigen::Matrix4d T_cam_lidar;
+
+    T_cam_lidar.setIdentity();
+    //z轴90 * y轴-90
+    T_cam_lidar.row(0) << 0, -1, 0, 0;
+    T_cam_lidar.row(1) << 0, 0, -1, 0;
+    T_cam_lidar.row(2) << 1, 0, 0, 0;
+    T_lidar_cam = T_cam_lidar.inverse();
+
+
     params_ = p;
 
     // 加载地图
@@ -46,9 +56,14 @@ bool LocalizationCore::init(const Params& p)
     for (const auto& mp : map_.map_points) {
         if (!mp.second) continue;
         pcl::PointXYZ p;
-        p.x = static_cast<float>(mp.second->x3D.x());
-        p.y = static_cast<float>(mp.second->x3D.y());
-        p.z = static_cast<float>(mp.second->x3D.z());
+        Eigen::Vector3d eigen_point;
+        eigen_point = T_lidar_cam.block<3,3>(0,0) * mp.second->x3D + T_lidar_cam.block<3,1>(0,3);
+        // p.x = static_cast<float>(mp.second->x3D.x());
+        // p.y = static_cast<float>(mp.second->x3D.y());
+        // p.z = static_cast<float>(mp.second->x3D.z());
+        p.x = static_cast<float>(eigen_point.x());
+        p.y = static_cast<float>(eigen_point.y());
+        p.z = static_cast<float>(eigen_point.z());
         map_cloud_->push_back(p);
     }
     map_cloud_->width = map_cloud_->size();
@@ -218,9 +233,14 @@ void LocalizationCore::computeLoop()
             for (const auto& mp : tgt->map_points) {
                 if (!mp) continue;
                 pcl::PointXYZ p;
-                p.x = static_cast<float>(mp->x3D.x());
-                p.y = static_cast<float>(mp->x3D.y());
-                p.z = static_cast<float>(mp->x3D.z());
+                Eigen::Vector3d eigen_point;
+                eigen_point = T_lidar_cam.block<3,3>(0,0) * mp->x3D + T_lidar_cam.block<3,1>(0,3);
+                // p.x = static_cast<float>(mp->x3D.x());
+                // p.y = static_cast<float>(mp->x3D.y());
+                // p.z = static_cast<float>(mp->x3D.z());
+                p.x = static_cast<float>(eigen_point.x());
+                p.y = static_cast<float>(eigen_point.y());
+                p.z = static_cast<float>(eigen_point.z());
                 frame_cloud->push_back(p);
             }
             frame_cloud->width = frame_cloud->size();
