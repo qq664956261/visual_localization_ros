@@ -79,6 +79,7 @@ namespace vloc {
         // 读取相机 yaml（含 T_c1_c2）
         static bool read_cam_params(const std::string& path, VISUAL_MAPPING::Camera& cam1,
         VISUAL_MAPPING::Camera& cam2, Eigen::Matrix4d& T12);
+        Eigen::Matrix4d T_lidar_cam;
 
 
     private:
@@ -128,7 +129,7 @@ namespace vloc {
         std::deque<StereoItem> q_;
         std::atomic<bool> running_{false};
         cv::Ptr<cv::CLAHE> clahe_;
-        Eigen::Matrix4d T_lidar_cam;
+
     };
 
 

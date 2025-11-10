@@ -48,7 +48,7 @@ bool LocalizationCore::init(const Params& p)
     if (params_.use_clahe) clahe_ = cv::createCLAHE(3.0, cv::Size(8,8));
 
     // 可视化线程
-    vis_thread_ = std::thread(Visualization::run, &vis_, std::ref(map_));
+    //vis_thread_ = std::thread(Visualization::run, &vis_, std::ref(map_));
 
     // 新增：静态地图点云缓存
     map_cloud_.reset(new pcl::PointCloud<pcl::PointXYZ>());
@@ -205,7 +205,7 @@ void LocalizationCore::computeLoop()
         init_T_ = init_T_ * dT;
 
         // 可视化
-        vis_.add_current_frame(tgt);
+        //vis_.add_current_frame(tgt);
 
         // 调试图
         if (params_.enable_debug) {

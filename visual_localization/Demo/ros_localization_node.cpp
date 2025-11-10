@@ -86,12 +86,13 @@ void RosLocalizationNode::stereoCallback(const sensor_msgs::ImageConstPtr& left_
 void RosLocalizationNode::onPose(const Eigen::Matrix4d& T_w_c, double timestamp_sec)
 {
     ros::Time stamp; stamp.fromSec(timestamp_sec);
+    Eigen::Matrix4d T_w_l = T_lidar_cam * T_w_c * T_lidar_cam.inverse();
 
     geometry_msgs::PoseStamped ps; ps.header.stamp = stamp; ps.header.frame_id = world_frame_;
-    Eigen::Quaterniond q(T_w_c.block<3,3>(0,0));
-    ps.pose.position.x = T_w_c(0,3);
-    ps.pose.position.y = T_w_c(1,3);
-    ps.pose.position.z = T_w_c(2,3);
+    Eigen::Quaterniond q(T_w_l.block<3,3>(0,0));
+    ps.pose.position.x = T_w_l(0,3);
+    ps.pose.position.y = T_w_l(1,3);
+    ps.pose.position.z = T_w_l(2,3);
     ps.pose.orientation.x = q.x();
     ps.pose.orientation.y = q.y();
     ps.pose.orientation.z = q.z();
