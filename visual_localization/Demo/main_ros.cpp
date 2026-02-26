@@ -1,17 +1,17 @@
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include "ros_localization_node.h"
 
-int main(int argc, char** argv)
-{
-    ros::init(argc, argv, "visual_localization_node");
-    ros::NodeHandle nh;
-    ros::NodeHandle pnh("~");
+int main(int argc, char** argv) {
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<rclcpp::Node>("visual_localization_node");
+
     try {
-        vloc::RosLocalizationNode node(nh, pnh);
-        ros::spin();
+        auto app = std::make_shared<vloc::RosLocalizationNode>(node);
+        rclcpp::spin(node);
     } catch (const std::exception& e) {
-        ROS_FATAL("Exception: %s", e.what());
-        return 1;
+        RCLCPP_FATAL(node->get_logger(), "Exception: %s", e.what());
     }
+
+    rclcpp::shutdown();
     return 0;
 }
